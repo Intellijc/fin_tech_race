@@ -3,14 +3,15 @@ import time
 import yaml
 import openai
 from duckduckgo_search import DDGS
-from pocketflow import Node, Flow
-from dotenv import load_dotenv
-# 加载环境变量
-load_dotenv()
+from openai import OpenAI
 
-# 从环境变量中初始化 OpenAI API 密钥
-openai.api_key ="f60e31b8-0380-45e1-89e9-0478c5dbf4f9"
-openai.api_base ="https://ark.cn-beijing.volces.com/api/v3"
+import config
+from pocketflow import Node, Flow
+
+client = OpenAI(
+    api_key=config.OPENAI_API_KEY,
+    base_url=config.OPENAI_BASE_URL
+)
 
 class IndustryResearchFlow(Node):  # 研报生成的决策节点
     def prep(self, shared):
@@ -155,8 +156,8 @@ class CompleteReport(Node):  # 研报完成节点
         return None
 
 def call_llm(prompt: str) -> str:
-    response = openai.chat.completions.create(
-        model="doubao-seed-1-6-flash-250615",
+    response = client.chat.completions.create(
+        model=config.OPENAI_MODEL,
         messages=[{"role": "user", "content": prompt}],
         temperature=0.7
     )
